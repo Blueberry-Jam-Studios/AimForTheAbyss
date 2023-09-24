@@ -1,0 +1,23 @@
+@startuml fire_pistol
+
+start
+:FirePistol;
+note right
+ui
+the weapon shines on the three points
+end note
+
+-> load, pull trigger; 
+
+:Bullet in the Air;
+note right
+the state lasts for X seconds
+after the timeout return to FirePistol
+end note
+
+
+
+
+stop
+
+@enduml
