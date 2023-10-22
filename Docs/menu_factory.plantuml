@@ -1,0 +1,24 @@
+@startuml menu_factory
+
+class MainMenuClient {
+  factory: AbstractFactory
+}
+
+class AbstractFactory {
+  createMenuItems(): list
+}
+
+class MenuWithLevelsFactory {
+  createMenuItems(): 4
+}
+
+class MenuWithoutLevelsFactory {
+  createMenuItems(): 5
+}
+
+AbstractFactory <|.. MenuWithLevelsFactory
+AbstractFactory <|.. MenuWithoutLevelsFactory
+
+MainMenuClient --> AbstractFactory
+
+@enduml

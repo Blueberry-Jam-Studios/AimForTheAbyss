@@ -1,0 +1,11 @@
+@startuml state_machine
+
+state GameManager {
+}
+
+PausedState -> PlayingState : ESC
+PausedState <- PlayingState : ESC
+
+PlayingState -> DeathState : HP =  0
+
+@enduml

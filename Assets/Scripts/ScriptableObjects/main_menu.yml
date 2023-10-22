@@ -1,0 +1,24 @@
+---
+
+section1:
+  background: green
+  children:
+  - title
+  - subtitle
+
+section2:
+  background: purple
+  layout: "horizontal" or "vertical"
+  children:
+  - name: start_game
+    type: button
+
+  - name: options
+    type: button
+
+  - name: exit
+    type: button
+
+section3:
+  children:
+  - copyright
