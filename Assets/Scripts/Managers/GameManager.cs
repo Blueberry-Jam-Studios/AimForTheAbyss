@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour, IStateMachine
 
     void Start()
     {
-        if (gameManagerConfig == null) { throw new ArgumentException(); }
+        if (gameManagerConfig == null) { throw new ArgumentException("GameManager configuration is missing.."); }
 
         currentState = new PausedState(this);
         // setup the listeners to listen to the KeyCode Escape
