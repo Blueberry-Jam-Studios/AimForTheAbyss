@@ -58,6 +58,8 @@ public class PlayerController2D : MonoBehaviour
                     OnLandEvent.Invoke();
             }
         }
+
+        Move(Input.GetAxis("Horizontal"), Input.GetKeyDown(KeyCode.LeftShift), Input.GetKeyDown(KeyCode.Space));
     }
 
 
