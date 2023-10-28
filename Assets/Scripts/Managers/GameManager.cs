@@ -9,28 +9,51 @@ public class GameManager : MonoBehaviour, IStateMachine
 {
     private static readonly Dictionary<KeyCode, Action> inputToAction = new()
     {
-        { KeyCode.Return, Action.StartGame },
-        { KeyCode.Escape, Action.PauseGame }
+        { KeyCode.Return, Action.ToggleMainMenu },
+        { KeyCode.Escape, Action.TogglePause }
     };
 
+    public static GameManager Instance;
+
+    public AvailableGameState startingState = AvailableGameState.MainMenu;
     private State currentState;
     public IListener[] listeners;
     public GameManagerConfig gameManagerConfig;
 
-    void Start()
+    void Awake()
     {
-        if (gameManagerConfig == null) { throw new ArgumentException("GameManager configuration is missing.."); }
+        if (gameManagerConfig == null)
+            throw new ArgumentException("GameManager configuration is missing..");
 
-        currentState = new PausedState(this);
+        if (Instance == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(transform.parent.gameObject);
+            Instance = this;
+        }
+        else
+        {
+            // destroy the newly created one
+            Destroy(gameObject);
+        }
+
+        if (startingState == AvailableGameState.MainMenu)
+            currentState = new MainMenuState(this);
+        if (startingState == AvailableGameState.Playing)
+            currentState = new PlayingState(this);
+
         // setup the listeners to listen to the KeyCode Escape
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        foreach (KeyValuePair<KeyCode, Action> userInput in inputToAction)
         {
-            Debug.Log("Enter was pressed.. Starting the Game..");
-            currentState.HandleEvent(inputToAction[KeyCode.Return]);
+            if (Input.GetKeyDown(userInput.Key))
+            {
+                Debug.Log(userInput.Key + " was pressed.. Emitting event " + userInput.Value);
+                currentState.HandleEvent(userInput.Value);
+            }
         }
     }
 

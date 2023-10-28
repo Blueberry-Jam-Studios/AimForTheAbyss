@@ -5,32 +5,30 @@ using UnityEngine.SceneManagement;
 
 namespace States
 {
-    enum AvailableGameState
+    public enum AvailableGameState
     {
+        MainMenu,
         Playing,
         Paused,
         Dead
     }
 
-    class PausedState : State
+    class MainMenuState : State
     {
-        Scene pausedScene;
-        public PausedState(GameManager context) : base(context)
+        public MainMenuState(GameManager context) : base(context)
         {
-            pausedScene = SceneManager.GetActiveScene();
+            if (SceneManager.GetActiveScene().name != context.gameManagerConfig.MenuScene)
+            {
+                SceneManager.LoadScene(context.gameManagerConfig.MenuScene);
+            }
         }
 
         public override void HandleEvent(Action action)
         {
-            if (action == Action.StartGame)
+            if (action == Action.ToggleMainMenu)
             {
                 Debug.Log("The Game was started, loading the scene..");
-                // _context.mainMenu.HideMenu();
                 _context.TransitionTo(new PlayingState(_context));
-            }
-            if (action == Action.PauseGame)
-            {
-                SceneManager.SetActiveScene(pausedScene);
             }
         }
     }
@@ -39,29 +37,53 @@ namespace States
     // the Context.
     class PlayingState : State
     {
-        Scene playingScene;
-
         public PlayingState(GameManager context) : base(context)
         {
-            // the Scene is defined on the Config from the User's progress or level select
-            string playingSceneName = _context.gameManagerConfig.PlayingScene;
-
-            // TODO: only load the scne if it is not already loaded
-
-            SceneManager.LoadScene(sceneName: playingSceneName);
-            playingScene = SceneManager.GetSceneByName(playingSceneName);
-            SceneManager.SetActiveScene(playingScene);
+            if (SceneManager.GetActiveScene().name != context.gameManagerConfig.PlayingScene)
+            {
+                SceneManager.LoadScene(context.gameManagerConfig.PlayingScene);
+            }
+            // MainMenu pausedMenu = GameObject.FindWithTag("MainMenu").GetComponent<MainMenu>();
+            // pausedMenu.HideMenu();
+            Time.timeScale = 1f;
         }
 
         public override void HandleEvent(Action action)
         {
-            if (action == Action.PauseGame)
+            if (action == Action.TogglePause)
             {
                 Debug.Log("The Playing state transitions to the Paused state");
                 _context.TransitionTo(new PausedState(_context));
             }
         }
     }
+    class PausedState : State
+    {
+        MainMenu pausedMenu;
+        public PausedState(GameManager context) : base(context)
+        {
+            pausedMenu = GameObject.FindWithTag("MainMenu").GetComponent<MainMenu>();
+            pausedMenu.DisplayMenu();
+            Time.timeScale = 0.2f;
+        }
+
+        public override void HandleEvent(Action action)
+        {
+            if (action == Action.TogglePause)
+            {
+                Debug.Log("The Game was resumed..");
+                pausedMenu.HideMenu();
+                _context.TransitionTo(new PlayingState(_context));
+            }
+
+            if (action == Action.ToggleMainMenu)
+            {
+                Debug.Log("Returning the to the Main Menu..");
+                _context.TransitionTo(new MainMenuState(_context));
+            }
+        }
+    }
+
 
     class DeadState : State
     {

@@ -17,8 +17,8 @@ State <- GameManager
 
 enum Action
 {
-    StartGame
-    PauseGame
+    ToggleMainMenu
+    TogglePause
     OpenOptions
     ExitGame
 }

@@ -3,7 +3,7 @@
 state PausedState  
 state PlayingState
 
-PausedState -> PlayingState : StartGame
-PlayingState -> PausedState : PauseGame
+PausedState -> PlayingState : ToggleMainMenu
+PlayingState -> PausedState : TogglePause
 
 @enduml

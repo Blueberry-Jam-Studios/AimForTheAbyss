@@ -5,5 +5,7 @@ using UnityEngine;
 [CreateAssetMenu]
 public class GameManagerConfig : ScriptableObject
 {
+    public string MenuScene = "MenuScene";
+
     public string PlayingScene = "BuildingScene";
 }
