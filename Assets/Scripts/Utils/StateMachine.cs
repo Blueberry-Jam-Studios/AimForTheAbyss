@@ -16,5 +16,5 @@ public abstract class State
         this._context = context;
     }
 
-    public abstract void HandleEvent(KeyCode keycode);
+    public abstract void HandleEvent(Action action);
 }

@@ -2,19 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using States;
+using System;
 
 
 public class GameManager : MonoBehaviour, IStateMachine
 {
+    private static readonly Dictionary<KeyCode, Action> inputToAction = new()
+    {
+        { KeyCode.Return, Action.StartGame },
+        { KeyCode.Escape, Action.PauseGame }
+    };
 
     private State currentState;
     public IListener[] listeners;
-
-    public MainMenu mainMenu;
+    public GameManagerConfig gameManagerConfig;
 
     void Start()
     {
-        mainMenu = GameObject.FindWithTag("MainMenu").GetComponent<MainMenu>();
+        if (gameManagerConfig == null) { throw new ArgumentException(); }
 
         currentState = new PausedState(this);
         // setup the listeners to listen to the KeyCode Escape
@@ -22,10 +27,10 @@ public class GameManager : MonoBehaviour, IStateMachine
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            Debug.Log("Escape was pressed..");
-            currentState.HandleEvent(KeyCode.Escape);
+            Debug.Log("Enter was pressed.. Starting the Game..");
+            currentState.HandleEvent(inputToAction[KeyCode.Return]);
         }
     }
 

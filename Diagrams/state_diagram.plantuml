@@ -1,0 +1,28 @@
+@startuml state_diagram
+allow_mixing
+
+class State {
+  State(GameManager _context)
+
+  HandleEvent(Action currentAction)
+}
+
+class GameManager {
+  State currentState
+
+  TransitionTo(Action action, State newState)
+}
+
+State <- GameManager
+
+enum Action
+{
+    StartGame
+    PauseGame
+    OpenOptions
+    ExitGame
+}
+
+Action <.. State
+
+@enduml
