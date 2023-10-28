@@ -35,15 +35,15 @@ public class FadeOut : IAnimation
 
     public IAnimation PlayAnimation()
     {
-        Debug.Log("Playing the Fade In animation");
-        Opacity = 1;
+        Debug.Log("Playing the Fade Out animation");
+        Opacity = 0;
         return this;
     }
 
     public IAnimation PlayReversed()
     {
-        Debug.Log("Playing the Fade Out animation");
-        Opacity = 0;
+        Debug.Log("Playing the Fade In animation");
+        Opacity = 1;
         return this;
     }
 

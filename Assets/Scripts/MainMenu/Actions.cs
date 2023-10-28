@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 public enum Action
 {
-    StartGame,
-    PauseGame,
+    ToggleMainMenu,
+    TogglePause,
     OpenOptions,
     ExitGame
 }

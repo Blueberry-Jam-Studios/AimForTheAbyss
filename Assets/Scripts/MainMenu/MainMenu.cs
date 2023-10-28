@@ -11,44 +11,36 @@ public class MainMenu : MonoBehaviour
     // public string[] AvailablePlugins = { "FadeOut" };
 
     private CanvasGroup canvasGroup;
-    private List<IAnimation> animationsPlayed = new();
 
-    private IAnimation fadeAnim;
+    public float Opacity { get => canvasGroup.alpha; set => canvasGroup.alpha = value; }
 
     [SerializeField]
     private MainMenuConfig _menuConfig;
     public MainMenuConfig MenuConfig { get => _menuConfig; set => _menuConfig = value; }
 
+    void Awake()
+    {
+        canvasGroup = GetComponent<CanvasGroup>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         // If there is the animation plugin create the CanvasGroup on the child
-        canvasGroup = GetComponent<CanvasGroup>();
-
-        fadeAnim = new FadeOut(canvasGroup);
-        animationsPlayed.Add(fadeAnim);
-        ResetUI();
+        CreateUI();
         SetupPlugins(MenuConfig.Plugins);
     }
 
-    void Update()
+    public void DisplayMenu()
     {
-        fadeAnim.UpdateAnimation();
+        Opacity = 1;
+        // gameObject.SetActive(true);
     }
 
-    /// <summary>
-    /// Reset the UI of the Main Menu
-    /// </summary>
-    void ResetUI()
+    public void HideMenu()
     {
-        // play the animation of fade in 
-        fadeAnim.PlayAnimation();
-        CreateUI();
-
-        // create the menu items based on the config
-        // for example rescale elements after updating their content, 
-        // setup timers for animation,
-        MatchBoxToText();
+        Opacity = 0;
+        // gameObject.SetActive(value: false);
     }
 
     /// <summary>
@@ -56,7 +48,7 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     void CreateUI()
     {
-        Debug.Log("Creating the Menu UI of the Game: " + MenuConfig.GameTitle);
+        Debug.Log("Creating the Menu UI from the config: " + MenuConfig.GameTitle);
 
         // Create the main panel with the image
         GameObject menuPanel;
@@ -69,7 +61,7 @@ public class MainMenu : MonoBehaviour
         menuPanel = transform.GetChild(0).gameObject;
         Image menuPanelImage = menuPanel.GetOrAddComponent<Image>();
 
-        ChangeBackgroundImage(menuPanelImage, 1);
+        ChangeBackgroundImage(menuPanelImage, 0);
 
         Transform title = transform;
 
@@ -97,22 +89,6 @@ public class MainMenu : MonoBehaviour
     {
         // TODO: Add the functionality to the UI based on the Plugins enabled
     }
-
-    public void DisplayMenu()
-    {
-        gameObject.SetActive(true);
-        fadeAnim.PlayAnimation();
-        animationsPlayed.Add(fadeAnim);
-    }
-
-    public void HideMenu()
-    {
-        fadeAnim.PlayReversed();
-        animationsPlayed.Add(fadeAnim);
-        // gameObject.SetActive(false);
-    }
-
-    public float Opacity { get => canvasGroup.alpha; }
 
     /// <summary>
     /// Resize a Rect Transform to match the Text
