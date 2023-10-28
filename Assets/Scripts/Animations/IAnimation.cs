@@ -6,6 +6,8 @@
 /// </summary>
 public interface IAnimation
 {
+    void UpdateAnimation();
+
     IAnimation PlayAnimation();
 
     IAnimation PlayReversed();

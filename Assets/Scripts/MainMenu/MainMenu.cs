@@ -1,26 +1,39 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 [RequireComponent(typeof(CanvasGroup))]
 public class MainMenu : MonoBehaviour
 {
-
-    public string[] AvailablePlugins = { "FadeAnimation" };
+    // public string[] AvailablePlugins = { "FadeOut" };
 
     private CanvasGroup canvasGroup;
     private List<IAnimation> animationsPlayed = new();
 
+    private IAnimation fadeAnim;
+
+    [SerializeField]
+    private MainMenuConfig _menuConfig;
+    public MainMenuConfig MenuConfig { get => _menuConfig; set => _menuConfig = value; }
+
     // Start is called before the first frame update
     void Start()
     {
+        // If there is the animation plugin create the CanvasGroup on the child
         canvasGroup = GetComponent<CanvasGroup>();
-        IAnimation fadeOut = new FadeAnimation(canvasGroup).PlayReversed();
-        animationsPlayed.Add(fadeOut);
+
+        fadeAnim = new FadeOut(canvasGroup);
+        animationsPlayed.Add(fadeAnim);
         ResetUI();
+        SetupPlugins(MenuConfig.Plugins);
+    }
+
+    void Update()
+    {
+        fadeAnim.UpdateAnimation();
     }
 
     /// <summary>
@@ -29,30 +42,76 @@ public class MainMenu : MonoBehaviour
     void ResetUI()
     {
         // play the animation of fade in 
-
+        fadeAnim.PlayAnimation();
+        CreateUI();
 
         // create the menu items based on the config
-
         // for example rescale elements after updating their content, 
         // setup timers for animation,
         MatchBoxToText();
     }
 
+    /// <summary>
+    /// Create the Title and the Buttons of the Menu based on the configuration.
+    /// </summary>
+    void CreateUI()
+    {
+        Debug.Log("Creating the Menu UI of the Game: " + MenuConfig.GameTitle);
+
+        // Create the main panel with the image
+        GameObject menuPanel;
+        if (transform.childCount == 0)
+        {
+            menuPanel = new();
+            menuPanel.transform.parent = this.transform;
+        }
+
+        menuPanel = transform.GetChild(0).gameObject;
+        Image menuPanelImage = menuPanel.GetOrAddComponent<Image>();
+
+        ChangeBackgroundImage(menuPanelImage, 1);
+
+        Transform title = transform;
+
+        // Create the buttons
+
+        // Add the functionality to the buttons
+        MapControlsToActions();
+    }
+
+    void ChangeBackgroundImage(Image panelImage, int chosenImage)
+    {
+        panelImage.sprite = MenuConfig.BackgroundImage[chosenImage];
+    }
+
+    void MapControlsToActions()
+    {
+
+    }
+
+    /// <summary>
+    /// Setup the extra functionality from the plugins to the UI elements.
+    /// </summary>
+    /// <param name="plugins"> The array of the activated plugins. </param>
+    void SetupPlugins(string[] plugins)
+    {
+        // TODO: Add the functionality to the UI based on the Plugins enabled
+    }
+
     public void DisplayMenu()
     {
         gameObject.SetActive(true);
-        IAnimation fadeIn = new FadeAnimation(canvasGroup).PlayAnimation();
-        animationsPlayed.Add(fadeIn);
+        fadeAnim.PlayAnimation();
+        animationsPlayed.Add(fadeAnim);
     }
 
     public void HideMenu()
     {
-        IAnimation fadeOut = new FadeAnimation(canvasGroup).PlayReversed();
-        animationsPlayed.Add(fadeOut);
-        gameObject.SetActive(false);
+        fadeAnim.PlayReversed();
+        animationsPlayed.Add(fadeAnim);
+        // gameObject.SetActive(false);
     }
 
-    [SerializeField]
     public float Opacity { get => canvasGroup.alpha; }
 
     /// <summary>

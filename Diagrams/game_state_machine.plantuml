@@ -1,0 +1,9 @@
+@startuml game_state_machine
+
+state PausedState  
+state PlayingState
+
+PausedState -> PlayingState : StartGame
+PlayingState -> PausedState : PauseGame
+
+@enduml
