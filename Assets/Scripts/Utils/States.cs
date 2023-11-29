@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.iOS;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,12 +10,15 @@ namespace States
     {
         MainMenu,
         Playing,
+        Dialogue,
         Paused,
         Dead
     }
 
     class MainMenuState : State
     {
+        public override string Name { get; set; } = AvailableGameState.MainMenu.ToString();
+
         public MainMenuState(GameManager context) : base(context)
         {
             if (SceneManager.GetActiveScene().name != context.gameManagerConfig.MenuScene)
@@ -37,14 +41,14 @@ namespace States
     // the Context.
     class PlayingState : State
     {
+        public override string Name { get; set; } = AvailableGameState.Playing.ToString();
+
         public PlayingState(GameManager context) : base(context)
         {
             if (SceneManager.GetActiveScene().name != context.gameManagerConfig.PlayingScene)
             {
                 SceneManager.LoadScene(context.gameManagerConfig.PlayingScene);
             }
-            // MainMenu pausedMenu = GameObject.FindWithTag("MainMenu").GetComponent<MainMenu>();
-            // pausedMenu.HideMenu();
             Time.timeScale = 1f;
         }
 
@@ -55,16 +59,43 @@ namespace States
                 Debug.Log("The Playing state transitions to the Paused state");
                 _context.TransitionTo(new PausedState(_context));
             }
+
+            if (action == Action.ToggleDialogue)
+            {
+                Debug.Log("The Dialogue has started..");
+                _context.TransitionTo(new DialogueState(_context));
+            }
+        }
+    }
+
+    class DialogueState : State
+    {
+        public override string Name { get; set; } = AvailableGameState.Dialogue.ToString();
+
+        public DialogueState(GameManager context) : base(context)
+        {
+        }
+
+        public override void HandleEvent(Action action)
+        {
+            if (action == Action.ToggleDialogue)
+            {
+                Debug.Log("The Dialogue has ended..");
+                _context.TransitionTo(new PlayingState(_context));
+            }
         }
     }
     class PausedState : State
     {
-        MainMenu pausedMenu;
+        public override string Name { get; set; } = AvailableGameState.Paused.ToString();
+
+        readonly MainMenu pausedMenu;
+
         public PausedState(GameManager context) : base(context)
         {
             pausedMenu = GameObject.FindWithTag("MainMenu").GetComponent<MainMenu>();
             pausedMenu.DisplayMenu();
-            Time.timeScale = 0.2f;
+            Time.timeScale = 0f;
         }
 
         public override void HandleEvent(Action action)
@@ -87,16 +118,18 @@ namespace States
 
     class DeadState : State
     {
+        public override string Name { get; set; } = AvailableGameState.Dead.ToString();
+
         public DeadState(GameManager context) : base(context)
         {
-            // _context.mainMenu.HideMenu();
         }
 
-        public override void HandleEvent(Action actions)
+        public override void HandleEvent(Action action)
         {
-            Debug.Log("The Playing state transitions to the Paused state");
-            // _context.mainMenu.DisplayMenu();
-            _context.TransitionTo(new PausedState(_context));
+            Debug.Log("Returning to the MainMenu");
+            _context.TransitionTo(new MainMenuState(_context));
+
+            // TODO: return either to the MainMenu or restart the scene
         }
     }
 }

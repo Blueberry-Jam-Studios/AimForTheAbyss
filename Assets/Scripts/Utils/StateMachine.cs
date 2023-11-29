@@ -1,15 +1,15 @@
+using States;
 using UnityEngine;
 
 public interface IStateMachine
 {
-
+    public void TransitionTo(State newState);
 }
 
 public abstract class State
 {
     protected GameManager _context;
-
-    public string Name { get => this.GetType().Name; }
+    public virtual string Name { get; set; }
 
     public State(GameManager context)
     {

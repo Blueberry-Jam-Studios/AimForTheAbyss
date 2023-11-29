@@ -8,7 +8,7 @@ class State {
 }
 
 class GameManager {
-  State currentState
+  State CurrentState
 
   TransitionTo(Action action, State newState)
 }

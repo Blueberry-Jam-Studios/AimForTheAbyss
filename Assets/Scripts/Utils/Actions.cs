@@ -5,6 +5,8 @@ public enum Action
 {
     ToggleMainMenu,
     TogglePause,
+
+    ToggleDialogue,
     OpenOptions,
     ExitGame
 }
