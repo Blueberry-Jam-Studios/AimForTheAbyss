@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using GameStates;
 
 public class PlayerController2D : MonoBehaviour
 {
@@ -43,7 +44,7 @@ public class PlayerController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameManager.Instance.CurrentState.Name != States.AvailableGameState.Playing.ToString())
+        if (!GameManager.Instance.IsInState(GameState.Playing))
             return;
 
         bool wasGrounded = m_Grounded;
