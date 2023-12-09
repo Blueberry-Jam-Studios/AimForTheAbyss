@@ -1,72 +1,70 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using States;
+using GameStates;
 using System;
 using System.Linq;
+using Patterns;
 
-
-public class GameManager : MonoBehaviour, IStateMachine
+public class GameManager: Singleton<GameManager>
 {
-    private static readonly Dictionary<KeyCode, Action> inputToAction = new()
-    {
-        { KeyCode.Return, Action.ToggleMainMenu },
-        { KeyCode.Escape, Action.TogglePause }
-    };
 
-    public static GameManager Instance;
+    public Dictionary<GameState, State<GameState>> States { get; set; } = new();
+    public State<GameState> CurrentState { get; set; }
 
-    public AvailableGameState startingState = AvailableGameState.MainMenu;
-
-    public State CurrentState { get; set; }
+    public GameState startingState = GameState.MainMenu;
 
     public GameManagerConfig gameManagerConfig;
 
     public GameData gameData;
 
-    void Awake()
+    public FiniteStateMachine<GameState> fsm { get; private set; } = new();
+
+    new void Awake()
     {
+        base.Awake();
         if (gameManagerConfig == null)
             throw new ArgumentException("GameManager configuration is missing..");
 
-        if (Instance == null)
-        {
-            DontDestroyOnLoad(transform.parent.gameObject);
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        if (startingState == AvailableGameState.MainMenu)
-            CurrentState = new MainMenuState(this);
-        if (startingState == AvailableGameState.Playing)
-            CurrentState = new PlayingState(this);
-
+        PopulateStates();
+        SetState(startingState);
+        
         // TODO: Load the data using the DataPersistence
         gameData = new GameData();
     }
 
-    void Update()
-    {
-        foreach (KeyValuePair<KeyCode, Action> userInput in inputToAction.Where(userInput => Input.GetKeyDown(userInput.Key)))
-        {
-            Debug.Log(userInput.Key + " was pressed.. Emitting event " + userInput.Value);
-            CurrentState.HandleEvent(userInput.Value);
-        }
+    void PopulateStates()
+    { 
+        fsm.Add(GameState.MainMenu, new MainMenuState(this));
+        fsm.Add(GameState.Playing, new PlayingState(this));
+        fsm.Add(GameState.Paused, new PausedState(this));
+        fsm.Add(GameState.Dialogue, new DialogueState(this));
+        fsm.Add(GameState.Dead, new DeadState(this));
     }
 
-    public void TransitionTo(State newState)
+    void Update()
     {
-        CurrentState = newState;
+        fsm.Update();
     }
 
     public void StartGame()
     {
         Debug.Log("Starting the Game..");
-        CurrentState.HandleEvent(Action.ToggleMainMenu);
+        SetState(GameState.Playing);
+    }
+
+    public bool IsInState(GameState desiredState)
+    {
+        return fsm.CurrentState == fsm.GetState(desiredState);
+    }
+
+    public bool SetState(GameState targetState)
+    { 
+        // TODO: Save the state and transition to the next one. 
+        // Return false if the save of the state failed.
+
+        fsm.SetCurrentState(targetState);
+        return true;
     }
 
     public void ExitGame()

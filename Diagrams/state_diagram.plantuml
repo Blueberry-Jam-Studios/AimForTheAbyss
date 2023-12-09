@@ -2,7 +2,7 @@
 allow_mixing
 
 class State {
-  State(GameManager _context)
+  State(GameManager gmStateMachine)
 
   HandleEvent(Action currentAction)
 }
@@ -19,7 +19,7 @@ enum Action
 {
     ToggleMainMenu
     TogglePause
-    OpenOptions
+    ToggleOptions
     ExitGame
 }
 
